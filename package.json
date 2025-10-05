@@ -1,242 +1,18 @@
 {
   "name": "zombiecoder-bengali-extension",
-  "displayName": "ZombieCoder Bengali Extension",
   "version": "1.0.0",
-  "description": "AI-powered coding assistant with Bengali language support and advanced automation",
-  "categories": [
-    "Other",
-    "Machine Learning",
-    "Programming Languages"
-  ],
-  "keywords": [
-    "ai",
-    "assistant",
-    "bengali",
-    "coding",
-    "copilot",
-    "automation"
-  ],
-  "publisher": "zombiecoder",
-  "main": "./out/extension.js",
+  "description": "ZombieCoder Bengali Language Extension with Admin Panel",
   "scripts": {
-    "build": "npm run package",
-    "compile": "webpack",
-    "compile-tests": "tsc -p . --outDir out",
-    "lint": "eslint src --ext ts",
-    "package": "webpack --mode production --devtool hidden-source-map",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "npm run package",
-    "vsix": "vsce package",
-    "watch": "webpack --watch",
-    "watch-tests": "tsc -p . -w --outDir out"
+    "build": "next build admin",
+    "db:backup": "ts-node scripts/backup-database.ts",
+    "db:health": "ts-node scripts/check-database-health.ts",
+    "db:migrate": "ts-node database/migrate.ts",
+    "db:migrate:down": "ts-node database/migrate.ts down",
+    "db:migrate:up": "ts-node database/migrate.ts up",
+    "db:restore": "ts-node scripts/restore-database.ts",
+    "dev": "next dev admin",
+    "start": "next start admin"
   },
-  "contributes": {
-    "commands": [
-      {
-        "command": "zombiecoder.openSidebar",
-        "title": "Open ZombieCoder Assistant",
-        "category": "ZombieCoder"
-      },
-      {
-        "command": "zombiecoder.toggleMode",
-        "title": "Toggle Local/Server Mode",
-        "category": "ZombieCoder"
-      },
-      {
-        "command": "zombiecoder.openSettings",
-        "title": "Open Settings",
-        "category": "ZombieCoder"
-      },
-      {
-        "command": "zombiecoder.refreshAgents",
-        "title": "Refresh Agents",
-        "category": "ZombieCoder"
-      }
-    ],
-    "configuration": {
-      "title": "ZombieCoder Bengali Extension",
-      "properties": {
-        "zombiecoder.mode": {
-          "type": "string",
-          "enum": [
-            "local",
-            "server"
-          ],
-          "default": "local",
-          "description": "Choose between Local Model or Server Mode",
-          "enumDescriptions": [
-            "Use local Ollama model for offline coding assistance",
-            "Connect to ZombieCoder server for advanced AI agents"
-          ]
-        },
-        "zombiecoder.selectedAgent": {
-          "type": "string",
-          "enum": [
-            "general-assistant",
-            "code-reviewer",
-            "bug-fixer",
-            "documentation",
-            "translator"
-          ],
-          "default": "general-assistant",
-          "description": "Select the AI agent for server mode",
-          "enumDescriptions": [
-            "General purpose coding assistant",
-            "Specialized in code review and optimization",
-            "Focused on finding and fixing bugs",
-            "Helps with documentation and comments",
-            "Translates code and comments between languages"
-          ]
-        },
-        "zombiecoder.ollamaUrl": {
-          "type": "string",
-          "default": "http://localhost:11434",
-          "description": "Ollama server URL for local mode",
-          "pattern": "^https?://.*",
-          "patternErrorMessage": "Must be a valid HTTP or HTTPS URL"
-        },
-        "zombiecoder.ollamaModel": {
-          "type": "string",
-          "default": "codellama",
-          "description": "Ollama model name for local mode",
-          "examples": [
-            "codellama",
-            "llama2",
-            "mistral",
-            "deepseek-coder"
-          ]
-        },
-        "zombiecoder.serverUrl": {
-          "type": "string",
-          "default": "http://localhost:12345",
-          "description": "ZombieCoder server URL for server mode",
-          "pattern": "^https?://.*",
-          "patternErrorMessage": "Must be a valid HTTP or HTTPS URL"
-        },
-        "zombiecoder.serverApiKey": {
-          "type": "string",
-          "default": "",
-          "description": "API key for ZombieCoder server (if required)"
-        },
-        "zombiecoder.autoStart": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically start ZombieCoder when VS Code opens"
-        },
-        "zombiecoder.showStatusBar": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show ZombieCoder status in the status bar"
-        },
-        "zombiecoder.enableVoiceCommands": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Bengali voice commands (experimental)"
-        },
-        "zombiecoder.responseLanguage": {
-          "type": "string",
-          "enum": [
-            "english",
-            "bengali",
-            "auto"
-          ],
-          "default": "english",
-          "description": "Language for AI responses",
-          "enumDescriptions": [
-            "Always respond in English",
-            "Always respond in Bengali",
-            "Auto-detect based on user input"
-          ]
-        },
-        "zombiecoder.maxTokens": {
-          "type": "number",
-          "default": 2048,
-          "minimum": 256,
-          "maximum": 8192,
-          "description": "Maximum tokens for AI responses"
-        },
-        "zombiecoder.temperature": {
-          "type": "number",
-          "default": 0.7,
-          "minimum": 0,
-          "maximum": 2,
-          "description": "AI response creativity (0.0 = focused, 2.0 = creative)"
-        },
-        "zombiecoder.enableLogging": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable detailed logging for debugging"
-        },
-        "zombiecoder.logLevel": {
-          "type": "string",
-          "enum": [
-            "error",
-            "warn",
-            "info",
-            "debug"
-          ],
-          "default": "info",
-          "description": "Logging level for debugging"
-        }
-      }
-    },
-    "menus": {
-      "view/title": [
-        {
-          "command": "zombiecoder.toggleMode",
-          "when": "view == zombiecoderSidebar",
-          "group": "navigation@1"
-        },
-        {
-          "command": "zombiecoder.openSettings",
-          "when": "view == zombiecoderSidebar",
-          "group": "navigation@2"
-        },
-        {
-          "command": "zombiecoder.refreshAgents",
-          "when": "view == zombiecoderSidebar",
-          "group": "navigation@3"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "zombiecoder.openSidebar",
-          "when": "zombiecoderEnabled"
-        },
-        {
-          "command": "zombiecoder.toggleMode",
-          "when": "zombiecoderEnabled"
-        },
-        {
-          "command": "zombiecoder.openSettings",
-          "when": "zombiecoderEnabled"
-        },
-        {
-          "command": "zombiecoder.refreshAgents",
-          "when": "zombiecoderEnabled"
-        }
-      ]
-    },
-    "views": {
-      "explorer": [
-        {
-          "id": "zombiecoderSidebar",
-          "name": "ZombieCoder Assistant",
-          "when": "zombiecoderEnabled"
-        }
-      ]
-    },
-    "viewsWelcome": [
-      {
-        "view": "zombiecoderSidebar",
-        "contents": "Welcome to ZombieCoder Assistant!\n[Open Settings](command:zombiecoder.openSettings)\n[Toggle Mode](command:zombiecoder.toggleMode)"
-      }
-    ]
-  },
-  "activationEvents": [
-    "onStartupFinished"
-  ],
   "dependencies": {
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-label": "latest",
@@ -247,42 +23,44 @@
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-switch": "latest",
     "@radix-ui/react-tabs": "latest",
+    "@radix-ui/react-toast": "latest",
     "@vercel/analytics": "latest",
+    "axios": "latest",
+    "better-sqlite3": "^9.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "latest",
+    "database": "latest",
+    "date-fns": "latest",
     "express": "latest",
+    "fs": "latest",
     "geist": "latest",
     "http-proxy-middleware": "latest",
     "lucide-react": "^0.454.0",
+    "mysql2": "latest",
     "next": "15.2.4",
     "next-themes": "latest",
-    "node-fetch": "^3.3.0",
+    "node-gyp": "latest",
     "path": "latest",
     "react": "^19",
     "react-dom": "^19",
+    "recharts": "latest",
+    "sqlite": "latest",
+    "sqlite3": "latest",
+    "swr": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "latest",
     "vscode": "latest"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/vscode": "^1.74.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "@vscode/test-electron": "^2.2.0",
-    "eslint": "^8.28.0",
     "postcss": "^8.5",
     "tailwindcss": "4.1.14",
-    "ts-loader": "^9.4.1",
-    "typescript": "^5",
-    "vsce": "^2.15.0",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.0"
-  },
-  "engines": {
-    "vscode": "^1.74.0"
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   }
 }

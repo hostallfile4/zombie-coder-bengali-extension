@@ -4,7 +4,7 @@
 [![VS Code](https://img.shields.io/badge/VS%20Code-1.74.0+-blue.svg)](https://code.visualstudio.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> AI-powered coding assistant with Bengali language support and advanced automation
+> AI-powered coding assistant with Bengali language support, real-time streaming, and advanced automation
 
 ## 🚀 Features
 
@@ -25,10 +25,19 @@
 - Native Bengali interface elements
 
 ### 💡 Copilot-Style Interface
-- Sidebar chat interface
-- Real-time typing indicators
-- Message history and context
-- VS Code theme integration
+- Sidebar chat interface with GitHub Copilot aesthetics
+- Real-time streaming responses via SSE
+- Live typing indicators with animated dots
+- Message history and context management
+- VS Code theme integration with dark mode support
+- File upload and context injection
+- Quick suggestion chips
+
+### ⚡ Real-Time Streaming
+- Server-Sent Events (SSE) for instant responses
+- Character-by-character streaming display
+- Low latency (< 100ms) streaming
+- Smooth cursor animations during typing
 
 ## 📦 Installation
 
@@ -48,18 +57,39 @@
 
 ### Local Mode (Recommended for Beginners)
 1. Install [Ollama](https://ollama.ai/)
-2. Pull a coding model: `ollama pull codellama`
-3. Open ZombieCoder settings and configure:
+   \`\`\`bash
+   # Install Ollama
+   curl -fsSL https://ollama.ai/install.sh | sh
+   
+   # Pull coding models
+   ollama pull codellama
+   ollama pull llama2
+   ollama pull mistral
+   \`\`\`
+2. Open ZombieCoder settings and configure:
    - Mode: Local
    - Ollama URL: `http://localhost:11434`
    - Model: `codellama`
 
-### Server Mode
-1. Set up your ZombieCoder server
-2. Configure in settings:
+### Server Mode (Advanced)
+1. Start the Gateway Server:
+   \`\`\`bash
+   npm run gateway
+   \`\`\`
+2. Start AI Agents:
+   \`\`\`bash
+   # Start all agents
+   npm run dev:all
+   
+   # Or start individually
+   npm run agent:codegen
+   npm run agent:bengali
+   npm run agent:review
+   \`\`\`
+3. Configure in VS Code settings:
    - Mode: Server
-   - Server URL: Your server endpoint
-   - API Key: If required
+   - Server URL: `http://127.0.0.1:8001`
+   - API Key: `zombiecoder-gateway-token`
 
 ## 🎮 Usage
 
@@ -72,6 +102,18 @@
 - Click the mode indicator in status bar
 - Use Command Palette: `ZombieCoder: Toggle Mode`
 - Change in settings panel
+
+### Using the Chat Interface
+1. Type your question in the input box
+2. Select mode (Chat/Code/Review) from dropdown
+3. Choose your preferred agent/model
+4. Press Enter or click Send
+5. Watch the AI response stream in real-time
+
+### Adding Context
+- Click "Context" button to add selected code
+- Click "File" button to upload files
+- Use suggestion chips for quick prompts
 
 ### Voice Commands (Experimental)
 Enable in settings and use Bengali voice commands:
@@ -88,11 +130,33 @@ Access settings via:
 
 ### Key Settings
 - **Mode**: Local or Server operation
-- **Ollama URL**: Local Ollama server endpoint
-- **Server URL**: ZombieCoder server endpoint
+- **Ollama URL**: Local Ollama server endpoint (default: `http://localhost:11434`)
+- **Server URL**: ZombieCoder gateway server endpoint (default: `http://127.0.0.1:8001`)
+- **API Key**: Authentication token for server mode
 - **Response Language**: English, Bengali, or Auto-detect
-- **Max Tokens**: Response length limit
-- **Temperature**: AI creativity level
+- **Max Tokens**: Response length limit (256-8192)
+- **Temperature**: AI creativity level (0.0-2.0)
+
+## 🏗️ Architecture
+
+\`\`\`
+VS Code Extension  ←→  Gateway Server (8001)  ←→  AI Agents (8002-8014)
+        │                     │                           │
+        │                     │                           ├─ Bengali NLP (8002)
+        │                     │                           ├─ Code Generation (8003)
+        │                     │                           ├─ Code Review (8004)
+        │                     │                           ├─ Documentation (8005)
+        │                     │                           ├─ Testing (8006)
+        │                     │                           ├─ Deployment (8007)
+        │                     │                           └─ Voice Processor (8014)
+        │
+        ▼
+   Web Dashboard (3000)  ←→  Admin Panel & Monitoring
+        │
+   Local Models (Ollama @11434)
+\`\`\`
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed system architecture.
 
 ## 🔧 Development
 
@@ -100,6 +164,7 @@ Access settings via:
 - Node.js 16+
 - VS Code 1.74.0+
 - TypeScript 4.9+
+- Ollama (for local mode)
 
 ### Building from Source
 \`\`\`bash
@@ -115,12 +180,53 @@ npm run compile
 
 # Package extension
 npm run package
+
+# Build VSIX
+npm run vsix
 \`\`\`
 
 ### Running in Development
 1. Open project in VS Code
 2. Press `F5` to launch Extension Development Host
 3. Test your changes in the new VS Code window
+
+### Running Backend Services
+\`\`\`bash
+# Start gateway server
+npm run gateway
+
+# Start code generator agent
+npm run agent:codegen
+
+# Start all services
+npm run dev:all
+\`\`\`
+
+### Testing the API
+\`\`\`bash
+# Health check
+curl http://localhost:8001/health
+
+# List models
+curl http://localhost:8001/v1/models
+
+# Test streaming chat
+curl -X POST http://localhost:8001/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer zombiecoder-gateway-token" \
+  -d '{
+    "model": "codellama",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "stream": true
+  }'
+\`\`\`
+
+## 📊 Performance Targets
+
+- Chat response: < 2s
+- Code completion: < 500ms
+- Streaming latency: < 100ms
+- Extension activation: < 1s
 
 ## 🤝 Contributing
 
@@ -145,6 +251,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Ollama](https://ollama.ai/) for local AI model support
 - [VS Code Extension API](https://code.visualstudio.com/api) for the platform
 - Bengali language community for feedback and support
+- GitHub Copilot for UI/UX inspiration
 
 ---
 

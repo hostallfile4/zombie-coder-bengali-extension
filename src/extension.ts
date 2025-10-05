@@ -41,6 +41,13 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage("Agents refreshed")
   })
 
+  const startGatewayCommand = vscode.commands.registerCommand("zombiecoder.startGateway", async () => {
+    const terminal = vscode.window.createTerminal("ZombieCoder Gateway")
+    terminal.sendText("npm run gateway")
+    terminal.show()
+    vscode.window.showInformationMessage("Gateway server starting on port 8001...")
+  })
+
   // Create status bar item
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
   const config = vscode.workspace.getConfiguration("zombiecoder")
@@ -68,6 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
     toggleModeCommand,
     openSettingsCommand,
     refreshAgentsCommand,
+    startGatewayCommand,
     statusBarItem,
     configChangeListener,
   )
