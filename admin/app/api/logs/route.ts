@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getDatabase } from "@/lib/db"
+import { initDatabase } from "@/lib/db"
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +8,9 @@ export async function GET(request: Request) {
     const component = searchParams.get("component")
     const limit = Number.parseInt(searchParams.get("limit") || "100")
 
-    const db = getDatabase()
+    const db = initDatabase()
+    await db.connect()
+    
     let query = "SELECT * FROM system_logs WHERE 1=1"
     const params: any[] = []
 
@@ -26,9 +28,12 @@ export async function GET(request: Request) {
     params.push(limit)
 
     const logs = await db.query(query, params)
-    return NextResponse.json({ logs })
+    return NextResponse.json({ success: true, logs: logs || [] })
   } catch (error) {
-    console.error("Error fetching logs:", error)
-    return NextResponse.json({ error: "Failed to fetch logs" }, { status: 500 })
+    console.error("[API] Error fetching logs:", error)
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : "Failed to fetch logs" },
+      { status: 500 }
+    )
   }
 }

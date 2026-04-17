@@ -1,31 +1,39 @@
 import { NextResponse } from "next/server"
-import { getDatabase } from "@/lib/db"
+import { initDatabase } from "@/lib/db"
 
 export async function GET() {
   try {
-    const db = getDatabase()
+    const db = initDatabase()
+    await db.connect()
+    
     const config = await db.query("SELECT * FROM system_config ORDER BY config_key")
-    return NextResponse.json({ config })
+    return NextResponse.json({ success: true, config: config || [] })
   } catch (error) {
-    console.error("Error fetching config:", error)
-    return NextResponse.json({ error: "Failed to fetch config" }, { status: 500 })
+    console.error("[API] Error fetching config:", error)
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : "Failed to fetch config" },
+      { status: 500 }
+    )
   }
 }
 
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    const db = getDatabase()
+    const db = initDatabase()
+    await db.connect()
 
-    await db.query(
-      `UPDATE system_config SET config_value = ?, updated_at = CURRENT_TIMESTAMP 
-       WHERE config_key = ?`,
-      [body.value, body.key],
-    )
+    const sql = `UPDATE system_config SET config_value = ?, updated_at = CURRENT_TIMESTAMP 
+                 WHERE config_key = ?`
+    
+    await db.query(sql, [body.value, body.key])
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error updating config:", error)
-    return NextResponse.json({ error: "Failed to update config" }, { status: 500 })
+    console.error("[API] Error updating config:", error)
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : "Failed to update config" },
+      { status: 500 }
+    )
   }
 }

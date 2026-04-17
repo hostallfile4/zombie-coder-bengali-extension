@@ -1,10 +1,11 @@
 # ZombieCoder Bengali Extension
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=zombiecoder.zombiecoder-bengali-extension)
-[![VS Code](https://img.shields.io/badge/VS%20Code-1.74.0+-blue.svg)](https://code.visualstudio.com/)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/zombie-coder/bengali-extension)
+[![VS Code](https://img.shields.io/badge/VS%20Code-1.80.0+-blue.svg)](https://code.visualstudio.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-> AI-powered coding assistant with Bengali language support, real-time streaming, and advanced automation
+> Authentic AI-powered coding assistant with Bengali language support, real-time WebSocket communication, and production-ready database integration
 
 ## 🚀 Features
 
